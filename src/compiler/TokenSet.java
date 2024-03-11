@@ -48,14 +48,16 @@ public enum TokenSet {
     $$, // End of file
 
     // THESE ARE NOT USED IN THE GRAMMAR, BUT MIGHT BE USEFUL...  :)
-    UNIDENTIFIED_TOKEN, // Would probably be an "ID" in a "real programming language" (HINT!!!)
-    NUMBER; // A sequence of digits.
+    //NOT NECESARILY CORRECT --noah 
+    UNIDENTIFIED_TOKEN("id"), // Would probably be an "ID" in a "real programming language" (HINT!!!)
+    // what about decimal values and floating point numbers?
+    NUMBER("0","1", "2", "3", "4", "5","6", "7","8","9"); // A sequence of digits.
 
     /**
      * A list of all lexemes for each token.
      */
     private final List<String> lexemeList;
-
+    //the ... just means we can put a variable number of String args in the tokenStrings array -- noah 
     TokenSet(final String... tokenStrings) {
         this.lexemeList = new ArrayList<>(tokenStrings.length);
         this.lexemeList.addAll(Arrays.asList(tokenStrings));
@@ -69,6 +71,7 @@ public enum TokenSet {
      */
     static TokenSet getTokenFromLexeme(final String string) {
         // Just to be safe…
+        // remove whitespace around the lexeme -- noah 
         final var lexeme = string.trim();
 
         // An empty string/lexeme should mean no more tokens to process.
