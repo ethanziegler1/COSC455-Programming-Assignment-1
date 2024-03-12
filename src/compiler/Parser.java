@@ -1,6 +1,10 @@
 //  ************** REQUIRES JAVA 17 or later! (https://adoptium.net/) ************** //
 package compiler;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /*
@@ -40,6 +44,7 @@ class Parser {
     // The lexer, which will provide the tokens
     private final LexicalAnalyzer lexer;
 
+    List<String> symbolTable = new ArrayList<>();
     // The "code generator"
     private final CodeGenerator codeGenerator;
 
@@ -117,6 +122,10 @@ class Parser {
             codeGenerator.syntaxError(errorMessage, thisNode);
         }
     }
+    /*
+        figure 2.3.1 gives psuedo code for what we are doing
+     */
+
 
     // <SENTENCE> ::= <NOUN_PHRASE> <VERB_PHRASE> <NOUN_PHRASE> <PREP_PHRASE> <SENTENCE_TAIL>
     private void SENTENCE(final TreeNode parentNode) throws ParseException {
@@ -126,7 +135,6 @@ class Parser {
         VERB_PHRASE(thisNode);
         NOUN_PHRASE(thisNode);
         PREP_PHRASE(thisNode);
-        VARIABLE(parentNode);
         SENTENCE_TAIL(thisNode);
     }
 
@@ -232,10 +240,14 @@ class Parser {
     }
     private void VARIABLE(final TreeNode parentNode) throws ParseException{
         final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-        if (lexer.getCurrentToken() == TokenSet.VARIABLE) {
-            MATCH(thisNode, TokenSet.VARIABLE);
-            MATCH(thisNode, TokenSet.UNIDENTIFIED_TOKEN);
+        String currentLexeme = lexer.getCurrentLexeme();
+        if (symbolTable.contains(currentLexeme)){
+            codeGenerator.syntaxError("Already Declared this Variable", parentNode);
         }
+        else{
+            symbolTable.add(currentLexeme);
+        }
+
     }
 
     /////////////////////////////////////////////////////////////////////////////////////
