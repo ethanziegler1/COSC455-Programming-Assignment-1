@@ -34,10 +34,12 @@ public enum TokenSet {
     ADVERB("quickly", "secretly", "silently"),
     PREPOSITION("of", "on", "around", "with", "up"),
     PERIOD("."),
+
     READ("read"),
     LET("let"),
     WRITE("write"),
     VARIABLE("var"),
+
     EQUALS("="),
     ADD("+","-"),
     MULTIPLY("*","/"),
@@ -55,6 +57,9 @@ public enum TokenSet {
     ENDIF("endif"),
     OPEN_P("("),
     CLOSE_P(")"),
+    ID(""),
+    B_ARROW("<-"),
+
 
 
     $$, // End of file
