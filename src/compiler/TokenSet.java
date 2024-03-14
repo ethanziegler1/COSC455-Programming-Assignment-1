@@ -44,14 +44,26 @@ public enum TokenSet {
     RELATIONAL("<",">","=="),
     FACTOR("(,",")"),
     COMPARISON("if","then","else","endif"),
-    REPEAT("until","repeat"),
+    // REPEAT("until","repeat"),
+
+    //I started adding from the "Grammar from program 1" handout
+    UNTIL("until"),
+    REPEAT("repeat"),
+    IF("if"),
+    ELSE("else"),
+    THEN("then"),
+    ENDIF("endif"),
+    OPEN_P("("),
+    CLOSE_P(")"),
+
+
     $$, // End of file
 
     // THESE ARE NOT USED IN THE GRAMMAR, BUT MIGHT BE USEFUL...  :)
     //NOT NECESARILY CORRECT --noah 
-    UNIDENTIFIED_TOKEN("id"), // Would probably be an "ID" in a "real programming language" (HINT!!!)
-    // what about decimal values and floating point numbers?
-    NUMBER("0","1", "2", "3", "4", "5","6", "7","8","9"); // A sequence of digits.
+    UNIDENTIFIED_TOKEN, // Would probably be an "ID" in a "real programming language" (HINT!!!)
+    // what about decimal values and floating point numbers?--n
+    NUMBER; // A sequence of digits.
 
     /**
      * A list of all lexemes for each token.
