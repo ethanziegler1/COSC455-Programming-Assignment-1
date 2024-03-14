@@ -35,11 +35,37 @@ import java.util.logging.Logger;
  * 
  * <UNTIL_R> ::= <UNTIL> <id> <REPEAT>
  * <ITE> ::= <IF> <id> <THEN> <id> <ELSE> <id> <ENDIF>
- * <PROGRAM> ::=
- * <STMT_LIST> ::=
- * <STMT> ::=
- * <READ_STMT> ::=
- * <WRITE_STMT> ::=
+ * 
+ * <PROGRAM> ::= <STMT_LIST> $$
+ * <STMT_LIST> ::= <STMT> <STMT_LIST> | ε
+ * 
+ * <STMT> ::= <READ_STMT> | <WRITE_STMT> |  <VAR_DECL> | <SUBR_CALL> | let id <ASGN_STMT>
+ * 
+ * <READ_STMT> ::= read id
+ * <WRITE_STMT> ::= write expr 
+ * 
+ * <VAR_DECL> ::= var id
+ * <SUBR_CALL> ::= id (<ARG_LIST>)
+ * 
+ * <ASGN_STMT> ::= = <EXPR> | <- <SUBR_CALL>
+ * 
+ * <ARG_LIST> ::= <EXPR> <ARGS_TAIL>
+ * <ARGS_TAIL> ::= , <ARG_LIST> | ε
+ * 
+ * <EXPR> ::= <TERM> <TERM_TAIL>
+ * 
+ * <TERM> ::= <FACTOR> <FACTOR_TAIL>
+ * <TERM_TAIL> ::= <ADD_OP> <TERM> <TERM_TAIL> | ε
+ * 
+ * <FACTOR> ::= ( <EXPR> ) | id
+ * <FACTOR_TAIL> ::= <MULT_OP> <FACTOR> <FACTOR_TAIL> | ε
+ * 
+ * <CONDITION> ::= <EXPR> <REL_OPER> <EXPR>
+ * 
+ * <ADD_OP> ::= + | -
+ * <MULT_OP> ::= * | /
+ * 
+ * <REL_OPER> ::= > | < | ==
  * 
  * 
  */
