@@ -321,8 +321,8 @@ class Parser {
 /* OUR ADDED METHODS - N(oah)
 
 
- * <UNTIL_R> ::= <UNTIL> <id> <REPEAT>
- * <ITE> ::= <IF> <id> <THEN> <id> <ELSE> <id> <ENDIF>
+ * <UNTIL_R> ::= <UNTIL> <STMT> <REPEAT>
+ * <ITE> ::= <IF> <CONDITION> <THEN> <STMT> <ELSE> <STMT> <ENDIF>
  * 
  * <PROGRAM> ::= <STMT_LIST> $$
  * <STMT_LIST> ::= <STMT> <STMT_LIST> | ε
@@ -368,21 +368,78 @@ class Parser {
     }
 
     MATCH(thisNode, TokenSet.READ_STMT);
-    MATCH(thisNode, TokenSet.WRITE_STMT);
-    MATCH(thisNode, TokenSet.VAR_DECL);
+    // MATCH(thisNode, TokenSet.WRITE_STMT);
+    //this may be the better implementation - N 
+    WRITE_STMT(thisNode);
+    READ_STMT(thisNode);
     MATCH(thisNode, TokenSet.SUBR_CALL);
 }
- //   <STMT_LIST> ::= <STMT> <STMT_LIST> | ε
- private void STMT_LIST(final TreeNode parentNode) throws ParseException {
+// <WRITE_STMT> ::= write expr 
+//uses the write from the tokenset but creates a rule from our new grammar - N
+private void WRITE_STMT (final TreeNode parentNode) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree (parentNode) ;
+    MATCH (thisNode, TokenSet.WRITE);
+    EXPR (thisNode);
+}
+// <READ_STMT> ::= read id
+private void READ_STMT(final TreeNode parentNode ) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+    MATCH(thisNode, TokenSet.READ);
+    // ID(thisNode);
+    MATCH(thisNode, TokenSet.ID);
+}
+// <SUBR_CALL> ::= id (<ARG_LIST>)
+private void SUBR_CALL (final TreeNode parentNode) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree (parentNode) ;
+        // ID(thisNode);
+        if (lexer.getCurrentToken() == TokenSet.ID) {
+            MATCH(thisNode, TokenSet.ID);
+            MATCH(thisNode, TokenSet.OPEN_P);
+            ARG_LIST(thisNode);
+            MATCH(thisNode, TokenSet.CLOSE_P);
+        }
+}
+// <ARG_LIST> ::= <EXPR> <ARGS_TAIL>
+private void ARG_LIST(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
 
-    if (lexer.getCurrentToken() == TokenSet.STMT) {
-        MATCH(thisNode, TokenSet.STMT);
+/*    if (lexer.getCurrentToken() == TokenSet.EXPR) {
+        MATCH(thisNode, TokenSet.ARGS_TAIL);
         STMT_LIST(thisNode);
+    } else {
+        EMPTY(thisNode);
+    } */
+
+    EXPR(thisNode);
+    ARGS_TAIL(thisNode);
+}
+//<ARGS_TAIL> ::= , <ARG_LIST> | ε
+private void ARGS_TAIL(final TreeNode parentNode) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+
+    if (lexer.getCurrentToken() == TokenSet.ADJ_SEP) {
+        MATCH(thisNode, TokenSet.ADJ_SEP);
+        ARG_LIST(thisNode);
     } else {
         EMPTY(thisNode);
     }
 }
+//REVIEW
+ //   <STMT_LIST> ::= <STMT> <STMT_LIST> | ε
+ private void STMT_LIST(final TreeNode parentNode) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+
+    // if (lexer.getCurrentToken() == TokenSet.STMT) {
+    //     MATCH(thisNode, TokenSet.STMT);
+    //     STMT_LIST(thisNode);
+    // } else {
+    //     EMPTY(thisNode);
+    // }
+        STMT(thisNode);
+        STMT_LIST(thisNode);
+        EMPTY(thisNode);
+}
+//REVIEW
 // <EXPR> ::= <TERM> <TERM_TAIL>
 private void EXPR(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
@@ -392,24 +449,25 @@ private void EXPR(final TreeNode parentNode) throws ParseException {
         MATCH(thisNode, TokenSet.TERM_TAIL);
     }
 }
+//should be good but double check-N
 // <TERM> ::= <FACTOR> <FACTOR_TAIL>
 private void TERM(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
     
     if(lexer.getCurrentToken()== TokenSet.FACTOR){
         MATCH(thisNode, TokenSet.FACTOR);
-        MATCH(thisNode, TokenSet.FACTOR_TAIL);
+        FACTOR_TAIL(thisNode);
     }
-
 }
+//TERM PROBABLY NEEDS AN UPDATE - N 
 // <TERM_TAIL> ::= <ADD_OP> <TERM> <TERM_TAIL> | ε
 private void TERM_TAIL(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
 
     if (lexer.getCurrentToken() == TokenSet.ADD) {
         MATCH(thisNode, TokenSet.ADD);
-        MATCH(thisNode, TokenSet.TERM);
-        MATCH(thisNode, TokenSet.TERM_TAIL);
+        TERM(thisNode);
+        TERM_TAIL(thisNode);
     } else {
         EMPTY(thisNode);
     }
@@ -431,8 +489,8 @@ private void FACTOR_TAIL(final TreeNode parentNode) throws ParseException {
     if (lexer.getCurrentToken() == TokenSet.MULTIPLY) {
         MATCH(thisNode, TokenSet.MULTIPLY);
         MATCH(thisNode, TokenSet.FACTOR);
-        MATCH(thisNode, TokenSet.FACTOR_TAIL);
-    } else {
+        FACTOR_TAIL(thisNode);
+        } else {
         EMPTY(thisNode);
     }
 }
