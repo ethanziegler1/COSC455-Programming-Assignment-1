@@ -95,7 +95,7 @@ class Parser {
     * addNonTerminalToTree(parentNode) --- Adds a non-terminal node to the tree.
     * codeGenerator.addTerminalToTree(parentNode) --- Adds a terminal node to the tree.
     * syntaxError(message, node) --- Throws a ParseException with the given message and adds exception to the tree.
-    
+
     The code generator calls return a *new* TreeNode object representing the newly added node.
 
  3. The lexer implements:
@@ -153,7 +153,7 @@ class Parser {
     // <NOUN_PHRASE> ::= <ART> <ADJ_LIST> <NOUN>
     private void NOUN_PHRASE(final TreeNode parentNode) throws ParseException {
         final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-    
+
         MATCH(thisNode, TokenSet.ARTICLE);
         ADJ_LIST(thisNode);
         MATCH(thisNode, TokenSet.NOUN);
@@ -206,47 +206,35 @@ class Parser {
             EMPTY(thisNode);
         }
     }
-    private void RELATIONAL(final TreeNode parentNode) throws ParseException{
+
+    // PROGRAM ::= <STMT_LIST> <$$>
+    private void PROGRAM(final TreeNode parentNode) throws ParseException {
         final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-        if (lexer.getCurrentToken() == TokenSet.RELATIONAL) {
-            MATCH(thisNode, TokenSet.RELATIONAL);
+
+        STMT_LIST(thisNode);
+        MATCH(thisNode, TokenSet.$$);
+    }
+
+
+        // STMT_LIST ::= <STMT> <STMT_LIST> | <$$> | e
+    private void STMT_LIST(final TreeNode parentNode) throws ParseException {
+        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+
+        if(lexer.getCurrentToken() == TokenSet.UNIDENTIFIED_TOKEN
+                || lexer.getCurrentToken() == TokenSet.READ
+                || lexer.getCurrentToken() == TokenSet.WRITE) {
+            STMT(thisNode);
+            STMT_LIST(thisNode);
+        } else if (lexer.getCurrentToken() == TokenSet.$$){
+            MATCH(thisNode, TokenSet.$$);
+    }
+        else{
+            ParseException e = new ParseException("Not correct format");
         }
     }
 
-    private void READ(final TreeNode parentNode) throws ParseException{
+    private void STMT(final TreeNode parentNode) throws ParseException {
         final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-        if (lexer.getCurrentToken() == TokenSet.READ) {
-            MATCH(thisNode, TokenSet.READ);
-        }
-    }
-    private void ADD(final TreeNode parentNode) throws ParseException{
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-        if (lexer.getCurrentToken() == TokenSet.ADD) {
-            MATCH(thisNode, TokenSet.ADD);
-        }
-    }
-    private void MULTIPLY(final TreeNode parentNode) throws ParseException{
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-        if (lexer.getCurrentToken() == TokenSet.MULTIPLY) {
-            MATCH(thisNode, TokenSet.MULTIPLY);
-        }
-    }
-    private void LET(final TreeNode parentNode) throws ParseException{
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-        if (lexer.getCurrentToken() == TokenSet.READ) {
-            MATCH(thisNode, TokenSet.READ);
-        }
-        
-    }
-    private void VARIABLE(final TreeNode parentNode) throws ParseException{
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-        String currentLexeme = lexer.getCurrentLexeme();
-        if (symbolTable.contains(currentLexeme)){
-            codeGenerator.syntaxError("Already Declared this Variable", parentNode);
-        }
-        else{
-            symbolTable.add(currentLexeme);
-        }
 
     }
 
@@ -266,8 +254,8 @@ class Parser {
      * Match the current token with the expected token.
      * If they match, add the token to the parse tree, otherwise throw an exception.
      *
-     * @param currentNode     The current terminal node.
-     * @param expectedToken   The token to be matched.
+     * @param currentNode   The current terminal node.
+     * @param expectedToken The token to be matched.
      * @throws ParseException Thrown if the token does not match the expected token.
      */
     private void MATCH(final TreeNode currentNode, final TokenSet expectedToken) throws ParseException {
