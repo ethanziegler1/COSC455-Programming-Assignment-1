@@ -60,7 +60,7 @@ class Parser {
         this.codeGenerator = codeGenerator;
 
         // Change this to automatically prompt to see the Open WebGraphViz dialog or not.
-        MAIN.PROMPT_FOR_GRAPHVIZ = false;
+        MAIN.PROMPT_FOR_GRAPHVIZ = true;
     }
 
     /*
