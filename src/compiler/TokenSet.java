@@ -3,6 +3,7 @@ COURSE: COSC455101
 Assignment: Program 1
 
 Name: Ziegler, Ethan
+Name1: Wilkens, Noah (N)
 */
 //  ************** REQUIRES JAVA 17 OR ABOVE! (https://adoptium.net/) ************** //
 package compiler;
@@ -34,34 +35,70 @@ public enum TokenSet {
     ADVERB("quickly", "secretly", "silently"),
     PREPOSITION("of", "on", "around", "with", "up"),
     PERIOD("."),
+
     READ("read"),
     LET("let"),
     WRITE("write"),
     VARIABLE("var"),
+
     EQUALS("="),
     ADD("+","-"),
     MULTIPLY("*","/"),
     RELATIONAL("<",">","=="),
-    OPENPAREN("(,"),
-    CLOSEDPAREN(")"),
-    IF("if"),
-    THEN("then"),
-    ELSE("else"),
-    ENDIF("endif"),
-    REPEAT("repeat"),
+    FACTOR("(,",")"),
+    COMPARISON("if","then","else","endif"),
+    // REPEAT("until","repeat"),
+
+    //I started adding from the "Grammar from program 1" handout - noah
     UNTIL("until"),
+    REPEAT("repeat"),
+
+    IF("if"),
+    ELSE("else"),
+    THEN("then"),
+    ENDIF("endif"),
+
+    OPEN_P("("),
+    CLOSE_P(")"),
+/*added these from looking at sample valid input but ID may just need to be empty - N 
+
+Ideally ID takes in any arbitrarty string that Is not already defined in tokenset or Parser
+*/
+    ID,
+
+    SUBR_ASSIGN("<-"),
     ASSIGN(":="),
+
+    // I Dont know if this works,😂 , check the parser to see if the method covers everythong from the grammar - N
+    STMT,
+    READ_STMT,
+    WRITE_STMT,
+    VAR_DECL("var"),
+    SUBR_CALL,
+    ASSGN_STMT,
+
+    EXPR,
+    TERM,
+    TERM_TAIL,
+    FACTOR_TAIL,
+
+
+
+
+
     $$, // End of file
 
     // THESE ARE NOT USED IN THE GRAMMAR, BUT MIGHT BE USEFUL...  :)
+    //NOT NECESARILY CORRECT --noah 
     UNIDENTIFIED_TOKEN, // Would probably be an "ID" in a "real programming language" (HINT!!!)
+    // what about decimal values and floating point numbers?--n
     NUMBER; // A sequence of digits.
 
     /**
      * A list of all lexemes for each token.
      */
     private final List<String> lexemeList;
-
+    //the ... just means we can put a variable number of String args in the tokenStrings array -- noah 
     TokenSet(final String... tokenStrings) {
         this.lexemeList = new ArrayList<>(tokenStrings.length);
         this.lexemeList.addAll(Arrays.asList(tokenStrings));
@@ -75,6 +112,7 @@ public enum TokenSet {
      */
     static TokenSet getTokenFromLexeme(final String string) {
         // Just to be safe…
+        // remove whitespace around the lexeme -- noah 
         final var lexeme = string.trim();
 
         // An empty string/lexeme should mean no more tokens to process.
