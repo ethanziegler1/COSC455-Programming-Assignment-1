@@ -235,7 +235,48 @@ class Parser {
 
     private void STMT(final TreeNode parentNode) throws ParseException {
         final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+        if(lexer.getCurrentToken() == TokenSet.UNIDENTIFIED_TOKEN){
+            MATCH(thisNode, TokenSet.UNIDENTIFIED_TOKEN);
+            MATCH(thisNode,TokenSet.ASSIGN);
+            EXPR();
+        } else if(lexer.getCurrentToken() == TokenSet.READ){
+            MATCH(thisNode,TokenSet.READ);
+            MATCH(thisNode, TokenSet.UNIDENTIFIED_TOKEN);
+        } else if(lexer.getCurrentToken() == TokenSet.WRITE){
+            MATCH(thisNode, TokenSet.WRITE);
+            EXPR();
+        } else {
+            ParseException e;
+        }
+    }
 
+    private void EXPR(final TreeNode parentNode) throws ParseException {
+        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+
+        if(lexer.getCurrentToken() == TokenSet.UNIDENTIFIED_TOKEN
+                || lexer.getCurrentToken() == TokenSet.NUMBER
+                || lexer.getCurrentToken() == TokenSet.OPENPAREN) {
+            TERM();
+            TERM_TAIl();
+        } else {
+            ParseException e;
+        }
+    }
+    //
+    private void TERM_TAIl(final TreeNode parentNode) throws ParseException {
+        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+        if (lexer.getCurrentToken() == TokenSet.ADD) {
+            ADD_OP();
+            TERM();
+            TERM_TAIl();
+        } else if(lexer.getCurrentToken() == TokenSet.UNIDENTIFIED_TOKEN
+                || lexer.getCurrentToken() == TokenSet.READ
+                || lexer.getCurrentToken() == TokenSet.WRITE
+                || lexer.getCurrentToken() == TokenSet.$$){
+
+            } else {
+            ParseException e;
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////

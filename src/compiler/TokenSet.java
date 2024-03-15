@@ -42,9 +42,15 @@ public enum TokenSet {
     ADD("+","-"),
     MULTIPLY("*","/"),
     RELATIONAL("<",">","=="),
-    FACTOR("(,",")"),
-    COMPARISON("if","then","else","endif"),
-    REPEAT("until","repeat"),
+    OPENPAREN("(,"),
+    CLOSEDPAREN(")"),
+    IF("if"),
+    THEN("then"),
+    ELSE("else"),
+    ENDIF("endif"),
+    REPEAT("repeat"),
+    UNTIL("until"),
+    ASSIGN(":="),
     $$, // End of file
 
     // THESE ARE NOT USED IN THE GRAMMAR, BUT MIGHT BE USEFUL...  :)
