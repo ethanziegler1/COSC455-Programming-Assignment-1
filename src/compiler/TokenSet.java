@@ -60,8 +60,11 @@ public enum TokenSet {
 
     OPEN_P("("),
     CLOSE_P(")"),
+/*added these from looking at sample valid input but ID may just need to be empty - N 
 
-    ID(),
+Ideally ID takes in any arbitrarty string that Is not already defined in tokenset or Parser
+*/
+    ID("sum","n","abs"),
 
     B_ARROW("<-"),
 

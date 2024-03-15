@@ -254,12 +254,16 @@ class Parser {
         final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
         if (lexer.getCurrentToken() == TokenSet.ADD) {
             MATCH(thisNode, TokenSet.ADD);
+        }else {
+            EMPTY(thisNode);
         }
     }
     private void MULTIPLY(final TreeNode parentNode) throws ParseException{
         final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
         if (lexer.getCurrentToken() == TokenSet.MULTIPLY) {
             MATCH(thisNode, TokenSet.MULTIPLY);
+        }else {
+            EMPTY(thisNode);
         }
     }
     private void LET(final TreeNode parentNode) throws ParseException{
