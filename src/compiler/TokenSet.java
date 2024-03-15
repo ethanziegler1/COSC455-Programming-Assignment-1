@@ -3,6 +3,7 @@ COURSE: COSC455101
 Assignment: Program 1
 
 Name: Ziegler, Ethan
+Name1: Wilkens, Noah (N)
 */
 //  ************** REQUIRES JAVA 17 OR ABOVE! (https://adoptium.net/) ************** //
 package compiler;
@@ -48,17 +49,36 @@ public enum TokenSet {
     COMPARISON("if","then","else","endif"),
     // REPEAT("until","repeat"),
 
-    //I started adding from the "Grammar from program 1" handout
+    //I started adding from the "Grammar from program 1" handout - noah
     UNTIL("until"),
     REPEAT("repeat"),
+
     IF("if"),
     ELSE("else"),
     THEN("then"),
     ENDIF("endif"),
+
     OPEN_P("("),
     CLOSE_P(")"),
-    ID(""),
+
+    ID(),
+
     B_ARROW("<-"),
+
+    // I Dont know if this works,😂 , check the parser to see if the method covers everythong from the grammar - N
+    STMT,
+    READ_STMT,
+    WRITE_STMT,
+    VAR_DECL,
+    SUBR_CALL,
+    ASSGN_STMT,
+
+    EXPR,
+    TERM,
+    TERM_TAIL,
+    FACTOR_TAIL,
+
+
 
 
 

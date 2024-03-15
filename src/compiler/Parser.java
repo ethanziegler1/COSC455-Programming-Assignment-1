@@ -44,10 +44,10 @@ import java.util.logging.Logger;
  * <READ_STMT> ::= read id
  * <WRITE_STMT> ::= write expr 
  * 
- * <VAR_DECL> ::= var id
+ * <VAR_DECL> ::= <VARIABLE> id
  * <SUBR_CALL> ::= id (<ARG_LIST>)
  * 
- * <ASGN_STMT> ::= = <EXPR> | <- <SUBR_CALL>
+ * <ASGN_STMT> ::= = <EXPR> | <B_ARROW> <SUBR_CALL>
  * 
  * <ARG_LIST> ::= <EXPR> <ARGS_TAIL>
  * <ARGS_TAIL> ::= , <ARG_LIST> | ε
@@ -311,4 +311,139 @@ class Parser {
             codeGenerator.syntaxError(errorMessage, currentNode);
         }
     }
+
+
+
+/* OUR ADDED METHODS - N(oah)
+
+
+ * <UNTIL_R> ::= <UNTIL> <id> <REPEAT>
+ * <ITE> ::= <IF> <id> <THEN> <id> <ELSE> <id> <ENDIF>
+ * 
+ * <PROGRAM> ::= <STMT_LIST> $$
+ * <STMT_LIST> ::= <STMT> <STMT_LIST> | ε
+ * 
+ * <STMT> ::= <READ_STMT> | <WRITE_STMT> |  <VAR_DECL> | <SUBR_CALL> | let id <ASGN_STMT>
+ * 
+ * <READ_STMT> ::= read id
+ * <WRITE_STMT> ::= write expr 
+ * 
+ * <VAR_DECL> ::= <VARIABLE> id
+ * <SUBR_CALL> ::= id (<ARG_LIST>)
+ * 
+ * <ASGN_STMT> ::= = <EXPR> | <B_ARROW> <SUBR_CALL>
+ * 
+ * <ARG_LIST> ::= <EXPR> <ARGS_TAIL>
+ * <ARGS_TAIL> ::= , <ARG_LIST> | ε
+ * 
+ * <EXPR> ::= <TERM> <TERM_TAIL>
+ * 
+ * <TERM> ::= <FACTOR> <FACTOR_TAIL>
+ * <TERM_TAIL> ::= <ADD_OP> <TERM> <TERM_TAIL> | ε
+ * 
+ * <FACTOR> ::= ( <EXPR> ) | id
+ * <FACTOR_TAIL> ::= <MULT_OP> <FACTOR> <FACTOR_TAIL> | ε
+ * 
+ * <CONDITION> ::= <EXPR> <REL_OPER> <EXPR>
+ * 
+ * <ADD_OP> ::= + | -
+ * <MULT_OP> ::= * | /
+ * 
+ * <REL_OPER> ::= > | < | ==
+ * 
+ * START OF METHODS FROM PSEUDOCODE (MAY NEED TO BE UPDATED TO BETTER REFLECT THE PSEUDOCODE
+ */    
+//  <STMT> ::= <READ_STMT> | <WRITE_STMT> |  <VAR_DECL> | <SUBR_CALL> | let id <ASGN_STMT>
+ private void STMT(final TreeNode parentNode) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+
+    if (lexer.getCurrentToken() == TokenSet.LET) {
+        MATCH(thisNode, TokenSet.LET);
+        MATCH(thisNode, TokenSet.ID);
+        MATCH(thisNode, TokenSet.ASSGN_STMT);
+    }
+
+    MATCH(thisNode, TokenSet.READ_STMT);
+    MATCH(thisNode, TokenSet.WRITE_STMT);
+    MATCH(thisNode, TokenSet.VAR_DECL);
+    MATCH(thisNode, TokenSet.SUBR_CALL);
+}
+ //   <STMT_LIST> ::= <STMT> <STMT_LIST> | ε
+ private void STMT_LIST(final TreeNode parentNode) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+
+    if (lexer.getCurrentToken() == TokenSet.STMT) {
+        MATCH(thisNode, TokenSet.STMT);
+        STMT_LIST(thisNode);
+    } else {
+        EMPTY(thisNode);
+    }
+}
+// <EXPR> ::= <TERM> <TERM_TAIL>
+private void EXPR(final TreeNode parentNode) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+
+    if(lexer.getCurrentToken()== TokenSet.TERM){
+        MATCH(thisNode, TokenSet.TERM);
+        MATCH(thisNode, TokenSet.TERM_TAIL);
+    }
+}
+// <TERM> ::= <FACTOR> <FACTOR_TAIL>
+private void TERM(final TreeNode parentNode) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+    
+    if(lexer.getCurrentToken()== TokenSet.FACTOR){
+        MATCH(thisNode, TokenSet.FACTOR);
+        MATCH(thisNode, TokenSet.FACTOR_TAIL);
+    }
+
+}
+// <TERM_TAIL> ::= <ADD_OP> <TERM> <TERM_TAIL> | ε
+private void TERM_TAIL(final TreeNode parentNode) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+
+    if (lexer.getCurrentToken() == TokenSet.ADD) {
+        MATCH(thisNode, TokenSet.ADD);
+        MATCH(thisNode, TokenSet.TERM);
+        MATCH(thisNode, TokenSet.TERM_TAIL);
+    } else {
+        EMPTY(thisNode);
+    }
+}
+//I created a few new Tokens in the token set that may seem redundant so feel free to edit things - N
+// <FACTOR> ::= ( <EXPR> ) | id
+private void FACTOR(final TreeNode parentNode) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+    if(lexer.getCurrentToken() == TokenSet.OPEN_P){
+        MATCH(thisNode, TokenSet.OPEN_P);
+        MATCH(thisNode, TokenSet.EXPR);
+        MATCH(thisNode, TokenSet.CLOSE_P);
+    }
+    MATCH(thisNode, TokenSet.ID);
+}
+// <FACTOR_TAIL> ::= <MULT_OP> <FACTOR> <FACTOR_TAIL> | ε
+private void FACTOR_TAIL(final TreeNode parentNode) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+    if (lexer.getCurrentToken() == TokenSet.MULTIPLY) {
+        MATCH(thisNode, TokenSet.MULTIPLY);
+        MATCH(thisNode, TokenSet.FACTOR);
+        MATCH(thisNode, TokenSet.FACTOR_TAIL);
+    } else {
+        EMPTY(thisNode);
+    }
+}
+
+//end of methods from pseudo-code
+
+/* 
+PROF has some methods for these already Up a little bit - N
+//<ADD_OP> ::= + | -
+private void ADD_OP(final TreeNode parentNode) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+}
+//<MULT_OP> ::= * | /
+private void MULT_OP(final TreeNode parentNode) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+}*/
+
 }
