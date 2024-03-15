@@ -345,11 +345,9 @@ private void STMT(final TreeNode parentNode) throws ParseException {
         MATCH(thisNode,TokenSet.ASSIGN);
         EXPR(thisNode);
     } else if(lexer.getCurrentToken() == TokenSet.READ){
-        MATCH(thisNode,TokenSet.READ);
-        MATCH(thisNode, TokenSet.ID);
+        READ_STMT(thisNode);
     } else if(lexer.getCurrentToken() == TokenSet.WRITE){
-        MATCH(thisNode, TokenSet.WRITE);
-        EXPR(thisNode);
+        WRITE_STMT(thisNode);
     } else {
         ParseException e;
     }
@@ -366,7 +364,6 @@ private void WRITE_STMT (final TreeNode parentNode) throws ParseException {
 private void READ_STMT(final TreeNode parentNode ) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
     MATCH(thisNode, TokenSet.READ);
-    // ID(thisNode);
     MATCH(thisNode, TokenSet.ID);
 }
 // <SUBR_CALL> ::= id (<ARG_LIST>)
