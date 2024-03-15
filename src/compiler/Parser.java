@@ -94,7 +94,7 @@ class Parser {
         this.codeGenerator = codeGenerator;
 
         // Change this to automatically prompt to see the Open WebGraphViz dialog or not.
-        MAIN.PROMPT_FOR_GRAPHVIZ = false;
+        MAIN.PROMPT_FOR_GRAPHVIZ = true;
     }
 
     /*
@@ -146,7 +146,7 @@ class Parser {
         final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
 
         // Invoke the first rule.
-        SENTENCE(thisNode);
+        PROGRAM(thisNode);
 
         // Test for the end of input ($$ meta token).
         if (lexer.getCurrentToken() != TokenSet.$$) {
@@ -165,7 +165,6 @@ class Parser {
         VERB_PHRASE(thisNode);
         NOUN_PHRASE(thisNode);
         PREP_PHRASE(thisNode);
-        VARIABLE(parentNode);
         SENTENCE_TAIL(thisNode);
     }
 
@@ -235,49 +234,6 @@ class Parser {
             NOUN_PHRASE(thisNode);
         } else {
             EMPTY(thisNode);
-        }
-    }
-    private void RELATIONAL(final TreeNode parentNode) throws ParseException{
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-        if (lexer.getCurrentToken() == TokenSet.RELATIONAL) {
-            MATCH(thisNode, TokenSet.RELATIONAL);
-        }
-    }
-
-    private void READ(final TreeNode parentNode) throws ParseException{
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-        if (lexer.getCurrentToken() == TokenSet.READ) {
-            MATCH(thisNode, TokenSet.READ);
-        }
-    }
-    private void ADD(final TreeNode parentNode) throws ParseException{
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-        if (lexer.getCurrentToken() == TokenSet.ADD) {
-            MATCH(thisNode, TokenSet.ADD);
-        }else {
-            EMPTY(thisNode);
-        }
-    }
-    private void MULTIPLY(final TreeNode parentNode) throws ParseException{
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-        if (lexer.getCurrentToken() == TokenSet.MULTIPLY) {
-            MATCH(thisNode, TokenSet.MULTIPLY);
-        }else {
-            EMPTY(thisNode);
-        }
-    }
-    private void LET(final TreeNode parentNode) throws ParseException{
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-        if (lexer.getCurrentToken() == TokenSet.READ) {
-            MATCH(thisNode, TokenSet.READ);
-        }
-        
-    }
-    private void VARIABLE(final TreeNode parentNode) throws ParseException{
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-        if (lexer.getCurrentToken() == TokenSet.VARIABLE) {
-            MATCH(thisNode, TokenSet.VARIABLE);
-            MATCH(thisNode, TokenSet.UNIDENTIFIED_TOKEN);
         }
     }
 
@@ -356,25 +312,51 @@ class Parser {
  * <REL_OPER> ::= > | < | ==
  * 
  * START OF METHODS FROM PSEUDOCODE (MAY NEED TO BE UPDATED TO BETTER REFLECT THE PSEUDOCODE
- */    
-//  <STMT> ::= <READ_STMT> | <WRITE_STMT> |  <VAR_DECL> | <SUBR_CALL> | let id <ASGN_STMT>
- private void STMT(final TreeNode parentNode) throws ParseException {
+ */
+// PROGRAM ::= <STMT_LIST> <$$>
+private void PROGRAM(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
 
-    if (lexer.getCurrentToken() == TokenSet.LET) {
-        MATCH(thisNode, TokenSet.LET);
-        MATCH(thisNode, TokenSet.ID);
-        MATCH(thisNode, TokenSet.ASSGN_STMT);
+    STMT_LIST(thisNode);
+    MATCH(thisNode, TokenSet.$$);
+}
+
+    // STMT_LIST ::= <STMT> <STMT_LIST> | <$$> | e
+    private void STMT_LIST(final TreeNode parentNode) throws ParseException {
+        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+
+        if(lexer.getCurrentToken() == TokenSet.ID
+                || lexer.getCurrentToken() == TokenSet.READ
+                || lexer.getCurrentToken() == TokenSet.WRITE) {
+            STMT(thisNode);
+            STMT_LIST(thisNode);
+        } else if (lexer.getCurrentToken() == TokenSet.$$){
+            MATCH(thisNode, TokenSet.$$);
+        }
+        else{
+            ParseException e = new ParseException("Not correct format");
+        }
     }
 
-    MATCH(thisNode, TokenSet.READ_STMT);
-    // MATCH(thisNode, TokenSet.WRITE_STMT);
-    //this may be the better implementation - N 
-    WRITE_STMT(thisNode);
-    READ_STMT(thisNode);
-    MATCH(thisNode, TokenSet.SUBR_CALL);
+    //  <STMT> ::= <READ_STMT> | <WRITE_STMT> |  <VAR_DECL> | <SUBR_CALL> | let id <ASGN_STMT>
+private void STMT(final TreeNode parentNode) throws ParseException {
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+    if(lexer.getCurrentToken() == TokenSet.ID){
+        MATCH(thisNode, TokenSet.ID);
+        MATCH(thisNode,TokenSet.ASSIGN);
+        EXPR(thisNode);
+    } else if(lexer.getCurrentToken() == TokenSet.READ){
+        MATCH(thisNode,TokenSet.READ);
+        MATCH(thisNode, TokenSet.ID);
+    } else if(lexer.getCurrentToken() == TokenSet.WRITE){
+        MATCH(thisNode, TokenSet.WRITE);
+        EXPR(thisNode);
+    } else {
+        ParseException e;
+    }
 }
-// <WRITE_STMT> ::= write expr 
+
+// <WRITE_STMT> ::= write expr
 //uses the write from the tokenset but creates a rule from our new grammar - N
 private void WRITE_STMT (final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree (parentNode) ;
@@ -424,61 +406,64 @@ private void ARGS_TAIL(final TreeNode parentNode) throws ParseException {
         EMPTY(thisNode);
     }
 }
-//REVIEW
- //   <STMT_LIST> ::= <STMT> <STMT_LIST> | ε
- private void STMT_LIST(final TreeNode parentNode) throws ParseException {
-    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
 
-    // if (lexer.getCurrentToken() == TokenSet.STMT) {
-    //     MATCH(thisNode, TokenSet.STMT);
-    //     STMT_LIST(thisNode);
-    // } else {
-    //     EMPTY(thisNode);
-    // }
-        STMT(thisNode);
-        STMT_LIST(thisNode);
-        EMPTY(thisNode);
-}
 //REVIEW
 // <EXPR> ::= <TERM> <TERM_TAIL>
 private void EXPR(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
 
-    if(lexer.getCurrentToken()== TokenSet.TERM){
-        MATCH(thisNode, TokenSet.TERM);
-        MATCH(thisNode, TokenSet.TERM_TAIL);
+    if(lexer.getCurrentToken() == TokenSet.ID
+            || lexer.getCurrentToken() == TokenSet.NUMBER
+            || lexer.getCurrentToken() == TokenSet.OPEN_P) {
+        TERM(thisNode);
+        TERM_TAIl(thisNode);
+    } else {
+        ParseException e;
     }
 }
-//should be good but double check-N
+
+
+
+    //<TERM_TAIL> ::= <ADD_OP> <TERM> <TERM_TAIL> | ε
+    private void TERM_TAIl(final TreeNode parentNode) throws ParseException {
+        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+        if (lexer.getCurrentToken() == TokenSet.ADD) {
+            ADD_OP(thisNode);
+            TERM(thisNode);
+            TERM_TAIl(thisNode);
+        } else if(lexer.getCurrentToken() == TokenSet.ID
+                || lexer.getCurrentToken() == TokenSet.READ
+                || lexer.getCurrentToken() == TokenSet.WRITE
+                || lexer.getCurrentToken() == TokenSet.$$){
+            EMPTY(thisNode);
+        } else {
+            ParseException e;
+        }
+    }
+
 // <TERM> ::= <FACTOR> <FACTOR_TAIL>
 private void TERM(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
     
-    if(lexer.getCurrentToken()== TokenSet.FACTOR){
-        MATCH(thisNode, TokenSet.FACTOR);
+    if(lexer.getCurrentToken()== TokenSet.ID
+            || lexer.getCurrentToken()== TokenSet.NUMBER
+            || lexer.getCurrentToken() == TokenSet.OPEN_P) {
+        FACTOR(thisNode);
         FACTOR_TAIL(thisNode);
+    }else {
+        ParseException e;
     }
 }
-//TERM PROBABLY NEEDS AN UPDATE - N 
-// <TERM_TAIL> ::= <ADD_OP> <TERM> <TERM_TAIL> | ε
-private void TERM_TAIL(final TreeNode parentNode) throws ParseException {
-    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
 
-    if (lexer.getCurrentToken() == TokenSet.ADD) {
-        MATCH(thisNode, TokenSet.ADD);
-        TERM(thisNode);
-        TERM_TAIL(thisNode);
-    } else {
-        EMPTY(thisNode);
-    }
-}
-//I created a few new Tokens in the token set that may seem redundant so feel free to edit things - N
 // <FACTOR> ::= ( <EXPR> ) | id
 private void FACTOR(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-    if(lexer.getCurrentToken() == TokenSet.OPEN_P){
+    if(lexer.getCurrentToken()== TokenSet.ID){
+
+    }
+    else if(lexer.getCurrentToken() == TokenSet.OPEN_P){
         MATCH(thisNode, TokenSet.OPEN_P);
-        MATCH(thisNode, TokenSet.EXPR);
+        EXPR(thisNode);
         MATCH(thisNode, TokenSet.CLOSE_P);
     }
     MATCH(thisNode, TokenSet.ID);
@@ -495,17 +480,25 @@ private void FACTOR_TAIL(final TreeNode parentNode) throws ParseException {
     }
 }
 
-//end of methods from pseudo-code
 
-/* 
-PROF has some methods for these already Up a little bit - N
+//PROF has some methods for these already Up a little bit - N
 //<ADD_OP> ::= + | -
 private void ADD_OP(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+    if (lexer.getCurrentToken() == TokenSet.ADD) {
+        MATCH(thisNode, TokenSet.ADD);
+    } else {
+        ParseException e;
+    }
 }
 //<MULT_OP> ::= * | /
 private void MULT_OP(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-}*/
+    if (lexer.getCurrentToken() == TokenSet.MULTIPLY) {
+        MATCH(thisNode, TokenSet.MULTIPLY);
+    } else {
+        ParseException e;
+    }
+}
 
 }

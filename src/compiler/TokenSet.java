@@ -64,15 +64,16 @@ public enum TokenSet {
 
 Ideally ID takes in any arbitrarty string that Is not already defined in tokenset or Parser
 */
-    ID("sum","n","abs"),
+    ID,
 
-    B_ARROW("<-"),
+    SUBR_ASSIGN("<-"),
+    ASSIGN(":="),
 
     // I Dont know if this works,😂 , check the parser to see if the method covers everythong from the grammar - N
     STMT,
     READ_STMT,
     WRITE_STMT,
-    VAR_DECL,
+    VAR_DECL("var"),
     SUBR_CALL,
     ASSGN_STMT,
 
