@@ -148,13 +148,13 @@ class Parser {
         // Invoke the first rule.
         PROGRAM(thisNode);
 
-        // Test for the end of input ($$ meta token).
-        if (lexer.getCurrentToken() != TokenSet.$$) {
-            String currentLexeme = lexer.getCurrentLexeme();
-            var errorMessage =
-                    "SYNTAX ERROR: 'End of File' was expected but '%s' was found.".formatted(currentLexeme);
-            codeGenerator.syntaxError(errorMessage, thisNode);
-        }
+//        // Test for the end of input ($$ meta token).
+//        if (lexer.getCurrentToken() != TokenSet.$$) {
+//            String currentLexeme = lexer.getCurrentLexeme();
+//            var errorMessage =
+//                    "SYNTAX ERROR: 'End of File' was expected but '%s' was found.".formatted(currentLexeme);
+//            codeGenerator.syntaxError(errorMessage, thisNode);
+//        }
     }
 
     // <SENTENCE> ::= <NOUN_PHRASE> <VERB_PHRASE> <NOUN_PHRASE> <PREP_PHRASE> <SENTENCE_TAIL>
@@ -318,7 +318,6 @@ private void PROGRAM(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
 
     STMT_LIST(thisNode);
-    MATCH(thisNode, TokenSet.$$);
 }
 
     // STMT_LIST ::= <STMT> <STMT_LIST> | <$$> | e

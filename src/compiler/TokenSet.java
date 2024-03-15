@@ -64,7 +64,7 @@ public enum TokenSet {
 
 Ideally ID takes in any arbitrarty string that Is not already defined in tokenset or Parser
 */
-    ID,
+    ID("sum"),
 
     SUBR_ASSIGN("<-"),
     ASSIGN(":="),

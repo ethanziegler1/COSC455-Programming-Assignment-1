@@ -1,9 +1,9 @@
 # A pair of declaration statements
-var sum
-var n
+#var sum
+#var n
 
 # A read statement
-#read sum
+read sum
 
 # An assignment statement (without the "var sum" above, this would be an error).
 #let sum = sum + 1
