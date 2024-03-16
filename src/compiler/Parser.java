@@ -1,6 +1,8 @@
 //  ************** REQUIRES JAVA 17 or later! (https://adoptium.net/) ************** //
 package compiler;
 
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /*
@@ -79,7 +81,7 @@ class Parser {
     // The lexer, which will provide the tokens
     private final LexicalAnalyzer lexer;
 
-    // The "code generator"
+    private ArrayList symbolTable= new ArrayList();// The "code generator"
     private final CodeGenerator codeGenerator;
 
     /**
@@ -358,7 +360,7 @@ private void STMT(final TreeNode parentNode) throws ParseException {
 private void WRITE_STMT (final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree (parentNode) ;
     MATCH (thisNode, TokenSet.WRITE);
-    EXPR (thisNode);
+    MATCH(thisNode, TokenSet.ID);
 }
 // <READ_STMT> ::= read id
 private void READ_STMT(final TreeNode parentNode ) throws ParseException {
@@ -366,6 +368,18 @@ private void READ_STMT(final TreeNode parentNode ) throws ParseException {
     MATCH(thisNode, TokenSet.READ);
     MATCH(thisNode, TokenSet.ID);
 }
+
+    private void VARIABLE(final TreeNode parentNode) throws ParseException{
+        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+        String currentLexeme = lexer.getCurrentLexeme();
+        if (symbolTable.contains(currentLexeme)){
+            codeGenerator.syntaxError("Already Declared this Variable", parentNode);
+        }
+        else{
+            symbolTable.add(currentLexeme);
+        }
+    }
+
 // <SUBR_CALL> ::= id (<ARG_LIST>)
 private void SUBR_CALL (final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree (parentNode) ;
@@ -417,8 +431,6 @@ private void EXPR(final TreeNode parentNode) throws ParseException {
         ParseException e;
     }
 }
-
-
 
     //<TERM_TAIL> ::= <ADD_OP> <TERM> <TERM_TAIL> | ε
     private void TERM_TAIl(final TreeNode parentNode) throws ParseException {
