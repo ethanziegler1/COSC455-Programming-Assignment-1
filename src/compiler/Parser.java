@@ -110,7 +110,7 @@ class Parser {
     public void analyze(TreeNode treeRoot) {
         try {
             // THIS IS OUR START RULE
-            START(treeRoot);
+            PROGRAM(treeRoot);
         } catch (ParseException ex) {
             final String msg = String.format("%s\n", ex.getMessage());
             Logger.getAnonymousLogger().severe(msg);
@@ -143,101 +143,6 @@ class Parser {
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // <START> :== <SENTENCE> $$
-    private void START(final TreeNode parentNode) throws ParseException {
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-
-        // Invoke the first rule.
-        PROGRAM(thisNode);
-
-//        // Test for the end of input ($$ meta token).
-//        if (lexer.getCurrentToken() != TokenSet.$$) {
-//            String currentLexeme = lexer.getCurrentLexeme();
-//            var errorMessage =
-//                    "SYNTAX ERROR: 'End of File' was expected but '%s' was found.".formatted(currentLexeme);
-//            codeGenerator.syntaxError(errorMessage, thisNode);
-//        }
-    }
-
-    // <SENTENCE> ::= <NOUN_PHRASE> <VERB_PHRASE> <NOUN_PHRASE> <PREP_PHRASE> <SENTENCE_TAIL>
-    private void SENTENCE(final TreeNode parentNode) throws ParseException {
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-
-        NOUN_PHRASE(thisNode);
-        VERB_PHRASE(thisNode);
-        NOUN_PHRASE(thisNode);
-        PREP_PHRASE(thisNode);
-        SENTENCE_TAIL(thisNode);
-    }
-
-    // <SENTENCE_TAIL> ::= <CONJ> <SENTENCE> | <EOS>
-    private void SENTENCE_TAIL(final TreeNode parentNode) throws ParseException {
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-
-        if (lexer.getCurrentToken() == TokenSet.CONJUNCTION) {
-            MATCH(thisNode, TokenSet.CONJUNCTION);
-            SENTENCE(thisNode);
-        } else {
-            MATCH(thisNode, TokenSet.PERIOD);
-        }
-    }
-
-    // <NOUN_PHRASE> ::= <ART> <ADJ_LIST> <NOUN>
-    private void NOUN_PHRASE(final TreeNode parentNode) throws ParseException {
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-    
-        MATCH(thisNode, TokenSet.ARTICLE);
-        ADJ_LIST(thisNode);
-        MATCH(thisNode, TokenSet.NOUN);
-    }
-
-    // <ADJ_LIST> ::= <ADJECTIVE> <ADJ_TAIL> | ε
-    private void ADJ_LIST(final TreeNode parentNode) throws ParseException {
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-
-        if (lexer.getCurrentToken() == TokenSet.ADJECTIVE) {
-            MATCH(thisNode, TokenSet.ADJECTIVE);
-            ADJ_TAIL(thisNode);
-        } else {
-            EMPTY(thisNode);
-        }
-    }
-
-    // <ADJ_TAIL> ::= <COMMA> <ADJECTIVE> <ADJ_TAIL> | ε
-    private void ADJ_TAIL(final TreeNode parentNode) throws ParseException {
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-
-        if (lexer.getCurrentToken() == TokenSet.ADJ_SEP) {
-            MATCH(thisNode, TokenSet.ADJ_SEP);
-            MATCH(thisNode, TokenSet.ADJECTIVE);
-            ADJ_TAIL(thisNode);
-        } else {
-            EMPTY(thisNode);
-        }
-    }
-
-    // <VERB_PHRASE> ::= <ADVERB> <VERB> | <VERB>
-    private void VERB_PHRASE(final TreeNode parentNode) throws ParseException {
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-
-        if (lexer.getCurrentToken() == TokenSet.ADVERB) {
-            MATCH(thisNode, TokenSet.ADVERB);
-        }
-
-        MATCH(thisNode, TokenSet.VERB);
-    }
-
-    // <PREP_PHRASE> ::= <PREPOSITION> <NOUN_PHRASE> | ε
-    private void PREP_PHRASE(final TreeNode parentNode) throws ParseException {
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-
-        if (lexer.getCurrentToken() == TokenSet.PREPOSITION) {
-            MATCH(thisNode, TokenSet.PREPOSITION);
-            NOUN_PHRASE(thisNode);
-        } else {
-            EMPTY(thisNode);
-        }
-    }
 
     /////////////////////////////////////////////////////////////////////////////////////
 
@@ -320,6 +225,7 @@ private void PROGRAM(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
 
     STMT_LIST(thisNode);
+    MATCH(thisNode, TokenSet.$$);
 }
 
     // STMT_LIST ::= <STMT> <STMT_LIST> | <$$> | e
@@ -342,17 +248,16 @@ private void PROGRAM(final TreeNode parentNode) throws ParseException {
     //  <STMT> ::= <READ_STMT> | <WRITE_STMT> |  <VAR_DECL> | <SUBR_CALL> | let id <ASGN_STMT>
 private void STMT(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-    if(lexer.getCurrentToken() == TokenSet.ID){
-        MATCH(thisNode, TokenSet.ID);
-        MATCH(thisNode,TokenSet.ASSIGN);
-        EXPR(thisNode);
-    } else if(lexer.getCurrentToken() == TokenSet.READ){
+
+    if (lexer.getCurrentToken() == TokenSet.READ) {
         READ_STMT(thisNode);
-    } else if(lexer.getCurrentToken() == TokenSet.WRITE){
+    } else if (lexer.getCurrentToken() == TokenSet.WRITE) {
         WRITE_STMT(thisNode);
+    } else if (lexer.getCurrentToken() == TokenSet.ID) {
+        SUBR_CALL(thisNode);
     } else {
-        ParseException e;
-    }
+            ParseException e;
+        }
 }
 
 // <WRITE_STMT> ::= write expr
@@ -380,6 +285,7 @@ private void READ_STMT(final TreeNode parentNode ) throws ParseException {
         }
     }
 
+
 // <SUBR_CALL> ::= id (<ARG_LIST>)
 private void SUBR_CALL (final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree (parentNode) ;
@@ -391,6 +297,21 @@ private void SUBR_CALL (final TreeNode parentNode) throws ParseException {
             MATCH(thisNode, TokenSet.CLOSE_P);
         }
 }
+//<ASGN_STMT> ::= = <EXPR> | <B_ARROW> <SUBR_CALL>
+private void ASGN_STMT(final TreeNode fromNode) throws ParseException {
+    final var treeNode = codeGenerator.addNonTerminalToTree(fromNode);
+
+    if (lexer.getCurrentToken() == TokenSet.ASSIGN) {
+        MATCH(treeNode, TokenSet.ASSIGN);
+        EXPR(treeNode);
+    } else if (lexer.getCurrentToken() == TokenSet.SUBR_ASSIGN) {
+        MATCH(treeNode, TokenSet.SUBR_ASSIGN);
+        SUBR_CALL(treeNode);
+    } else {
+        codeGenerator.syntaxError("Illegal assignment statement!", fromNode);
+    }
+}
+
 // <ARG_LIST> ::= <EXPR> <ARGS_TAIL>
 private void ARG_LIST(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
@@ -508,5 +429,6 @@ private void MULT_OP(final TreeNode parentNode) throws ParseException {
         ParseException e;
     }
 }
+
 
 }
