@@ -6,7 +6,7 @@
 #read sum
 
 # An assignment statement (without the "var sum" above, this would be an error).
-let sum = sum + 1
+#let sum = sum * 1
 
 # Raw subroutine call
 #store(sum)
@@ -17,7 +17,7 @@ let sum = sum + 1
 #   let abs = 0 - abs
 
 #    # An until...repeat block.
-#    until sum > 100
+   until sum > 100
 #       let sum = sum * (1+n) - 100
 #   repeat
 #else

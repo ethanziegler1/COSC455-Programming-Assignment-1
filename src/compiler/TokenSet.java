@@ -44,8 +44,6 @@ public enum TokenSet {
     ADD("+","-"),
     MULTIPLY("*","/"),
     RELATIONAL("<",">","=="),
-    FACTOR("(,",")"),
-    COMPARISON("if","then","else","endif"),
     // REPEAT("until","repeat"),
 
     //I started adding from the "Grammar from program 1" handout - noah
@@ -63,7 +61,7 @@ public enum TokenSet {
 
 Ideally ID takes in any arbitrarty string that Is not already defined in tokenset or Parser
 */
-    ID(),
+    ID,
 
     SUBR_CALL("<-"),
     ASSIGN(":="),
