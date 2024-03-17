@@ -310,17 +310,6 @@ private void READ_STMT(final TreeNode parentNode ) throws ParseException {
     MATCH(thisNode, TokenSet.UNIDENTIFIED_TOKEN);
 }
 
-    private void VARIABLE(final TreeNode parentNode) throws ParseException{
-        final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
-        String currentLexeme = lexer.getCurrentLexeme();
-        if (symbolTable.contains(currentLexeme)){
-            codeGenerator.syntaxError("Already Declared this Variable", parentNode);
-        }
-        else{
-            symbolTable.add(currentLexeme);
-        }
-    }
-
 
 // <SUBR_CALL> ::= id (<ARG_LIST>)
 private void SUBR_CALL (final TreeNode parentNode) throws ParseException {
