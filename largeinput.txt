@@ -12,7 +12,7 @@ write sum
 let sum = sum * 1
 
 # Raw subroutine call
-#store(sum)
+store(sum)
 
 # An if...else block.
 if (n * 2) + 3 < 10 then

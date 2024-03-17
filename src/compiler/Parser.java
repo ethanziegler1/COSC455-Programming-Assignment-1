@@ -225,6 +225,9 @@ private void STMT(final TreeNode parentNode) throws ParseException {
             IF_STMT(thisNode);
             break;
         }
+        case UNIDENTIFIED_TOKEN:{
+            SUBR_CALL(thisNode);
+        }
         default: {
             EMPTY(thisNode);
             break;
