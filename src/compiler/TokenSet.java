@@ -39,7 +39,6 @@ public enum TokenSet {
     READ("read"),
     LET("let"),
     WRITE("write"),
-    VARIABLE("var"),
 
     EQUALS("="),
     ADD("+","-"),
@@ -64,9 +63,9 @@ public enum TokenSet {
 
 Ideally ID takes in any arbitrarty string that Is not already defined in tokenset or Parser
 */
-    ID("sum"),
+    ID(),
 
-    SUBR_ASSIGN("<-"),
+    SUBR_CALL("<-"),
     ASSIGN(":="),
 
     // I Dont know if this works,😂 , check the parser to see if the method covers everythong from the grammar - N
@@ -74,7 +73,6 @@ Ideally ID takes in any arbitrarty string that Is not already defined in tokense
     READ_STMT,
     WRITE_STMT,
     VAR_DECL("var"),
-    SUBR_CALL,
     ASSGN_STMT,
 
     EXPR,

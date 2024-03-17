@@ -3,10 +3,10 @@
 #var n
 
 # A read statement
-read sum
+#read sum
 
 # An assignment statement (without the "var sum" above, this would be an error).
-#let sum = sum + 1
+let sum = sum + 1
 
 # Raw subroutine call
 #store(sum)
