@@ -1,6 +1,7 @@
 //  ************** REQUIRES JAVA 17 or later! (https://adoptium.net/) ************** //
 package compiler;
 
+import java.awt.font.TextHitInfo;
 import java.sql.Array;
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -250,38 +251,51 @@ private void STMT(final TreeNode parentNode) throws ParseException {
         // First set of <stmt>
         case READ: {
             READ_STMT(thisNode);
+            break;
         }
         case WRITE_STMT:{
             WRITE_STMT(thisNode);
+            break;
+        }
+        case UNTIL:{
+            UNTIL_STMT(thisNode);
+            break;
         }
         case VAR_DECL:{
-            VARIABLE(thisNode);
+            MATCH(thisNode,TokenSet.VAR_DECL);
+            MATCH(thisNode,TokenSet.UNIDENTIFIED_TOKEN);
+            break;
         }
         case SUBR_CALL:{
             SUBR_CALL(thisNode);
+            break;
         }
         case LET:{
             MATCH(thisNode,TokenSet.LET);
             MATCH(thisNode,TokenSet.UNIDENTIFIED_TOKEN);
             ASGN_STMT(thisNode);
+            break;
         }
         case IF:{
             MATCH(thisNode,TokenSet.IF);
             EXPR(thisNode);
             MATCH(thisNode,TokenSet.THEN);
             EXPR(thisNode);
-        }
-        case UNTIL:{
-            MATCH(thisNode,TokenSet.UNTIL);
-            EXPR(thisNode);
-        }
-        case REPEAT:{
-            MATCH(thisNode, TokenSet.REPEAT);
+            break;
         }
         default: EMPTY(thisNode);
     }
 }
 
+//<UNTIL_STMT> ::= <until> <condition> <stmt_list> <repeat>
+    private void UNTIL_STMT(final TreeNode parentNode) throws ParseException{
+    final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
+
+        MATCH(thisNode, TokenSet.UNTIL);
+        EXPR(thisNode);
+        STMT_LIST(thisNode);
+        MATCH(thisNode, TokenSet.REPEAT);
+    }
 // <WRITE_STMT> ::= write expr
 //uses the write from the tokenset but creates a rule from our new grammar - N
 private void WRITE_STMT (final TreeNode parentNode) throws ParseException {

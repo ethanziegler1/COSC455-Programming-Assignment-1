@@ -1,19 +1,19 @@
 # A pair of declaration statements
-#var sum
-#var n
+var sum
+var n
 
 # A read statement
-#read sum
+read sum
 
 # An assignment statement (without the "var sum" above, this would be an error).
-#let sum = sum * 1
+let sum = sum * 1
 
 # Raw subroutine call
 #store(sum)
 
 # An if...else block.
 #if (n * 2) + 3 < 10 then
-#	var abs
+#   var abs
 #   let abs = 0 - abs
 
 #    # An until...repeat block.
@@ -21,10 +21,10 @@
        let sum = sum * (1+n) - 100
    repeat
 #else
-#    if n > 0 then
+#  if n > 0 then
 #     	# A subroutine call storing its return value.
 #	    let n <- calculate(n + 1)
-#   endif
+#  endif
 # endif
 
-# let abs = 0 - abs
+ let abs = 0 - abs
