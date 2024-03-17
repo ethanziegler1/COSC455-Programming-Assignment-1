@@ -3,7 +3,7 @@
 ######################################################################
 
 
-the dog loves the cat .
+#the dog loves the cat .
 
 # the dog chases the slow , lazy cat up a tall tree and the rat loves the dog .
 
@@ -19,3 +19,5 @@ the dog loves the cat .
 #             up a tall tree 
 #         and the 
 # rat loves the dog .
+
+store(sum)

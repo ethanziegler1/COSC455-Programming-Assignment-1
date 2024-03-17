@@ -1,3 +1,15 @@
+/*
+COURSE: COSC455.002
+Assignment: Program 1
+
+Name: Ziegler, Ethan
+Name: Wilkens, Noah
+
+Collaboration: Wrote grammar for each method and implemented new sets to TokenSet
+
+Could not get raw subroutine call to work due to lack of key for the switch statement
+*/
+
 //  ************** REQUIRES JAVA 17 or later! (https://adoptium.net/) ************** //
 package compiler;
 
@@ -5,73 +17,6 @@ import java.awt.font.TextHitInfo;
 import java.sql.Array;
 import java.util.ArrayList;
 import java.util.logging.Logger;
-
-/*
- * GRAMMAR FOR PROCESSING SIMPLE SENTENCES:
- *
- * <START> ::= <SENTENCE> $$
- * <SENTENCE> ::= <NOUN_PHRASE> <VERB_PHRASE> <NOUN_PHRASE> <PREP_PHRASE> <SENTENCE_TAIL>
- * <SENTENCE_TAIL> ::= <CONJ> <SENTENCE> | <EOS>
- *
- * <NOUN_PHRASE> ::= <ART> <ADJ_LIST> <NOUN>
- * <ADJ_LIST> ::= <ADJECTIVE> <ADJ_TAIL> | ε
- * <ADJ_TAIL> ::= <COMMA> <ADJECTIVE> <ADJ_TAIL> | ε
- *
- * <VERB_PHRASE> ::= <ADVERB> <VERB> | <VERB>
- * <PREP_PHRASE> ::= <PREPOSITION> <NOUN_PHRASE> | ε
- *
- * ### Terminal Productions (Actual terminals omitted, but they are just the valid words in the language). ###
- *
- * <COMMA> ::= ','
- * <EOS> ::= '.'
- *
- * <ADJECTIVE> ::= ...any adjective...
- * <ADVERB> ::= ...any adverb...
- * <ART> ::= ...any article...
- * <CONJ> ::= ...any conjunction...
- * <NOUN> ::= ...any noun...
- * <PREPOSITION> ::= ...any preposition...
- * <VERB> ::= ...any verb....
- * 
- * 
- * 
- * 
- * <UNTIL_R> ::= <UNTIL> <id> <REPEAT>
- * <ITE> ::= <IF> <id> <THEN> <id> <ELSE> <id> <ENDIF>
- * 
- * <PROGRAM> ::= <STMT_LIST> $$
- * <STMT_LIST> ::= <STMT> <STMT_LIST> | ε
- * 
- * <STMT> ::= <READ_STMT> | <WRITE_STMT> |  <VAR_DECL> | <SUBR_CALL> | let id <ASGN_STMT>
- * 
- * <READ_STMT> ::= read id
- * <WRITE_STMT> ::= write expr 
- * 
- * <VAR_DECL> ::= <VARIABLE> id
- * <SUBR_CALL> ::= id (<ARG_LIST>)
- * 
- * <ASGN_STMT> ::= = <EXPR> | <B_ARROW> <SUBR_CALL>
- * 
- * <ARG_LIST> ::= <EXPR> <ARGS_TAIL>
- * <ARGS_TAIL> ::= , <ARG_LIST> | ε
- * 
- * <EXPR> ::= <TERM> <TERM_TAIL>
- * 
- * <TERM> ::= <FACTOR> <FACTOR_TAIL>
- * <TERM_TAIL> ::= <ADD_OP> <TERM> <TERM_TAIL> | ε
- * 
- * <FACTOR> ::= ( <EXPR> ) | id
- * <FACTOR_TAIL> ::= <MULT_OP> <FACTOR> <FACTOR_TAIL> | ε
- * 
- * <CONDITION> ::= <EXPR> <REL_OPER> <EXPR>
- * 
- * <ADD_OP> ::= + | -
- * <MULT_OP> ::= * | /
- * 
- * <REL_OPER> ::= > | < | ==
- * 
- * 
- */
 
 /**
  * This is the syntax analyzer for the compiler implemented as a recursive
@@ -82,7 +27,7 @@ class Parser {
     // The lexer, which will provide the tokens
     private final LexicalAnalyzer lexer;
 
-    private ArrayList symbolTable= new ArrayList();// The "code generator"
+    // The "code generator"
     private final CodeGenerator codeGenerator;
 
     /**
@@ -253,7 +198,7 @@ private void STMT(final TreeNode parentNode) throws ParseException {
             READ_STMT(thisNode);
             break;
         }
-        case WRITE_STMT:{
+        case WRITE:{
             WRITE_STMT(thisNode);
             break;
         }
@@ -386,7 +331,6 @@ private void ARGS_TAIL(final TreeNode parentNode) throws ParseException {
     }
 }
 
-//REVIEW
 // <EXPR> ::= <TERM> <TERM_TAIL>
 private void EXPR(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);
@@ -456,7 +400,6 @@ private void FACTOR_TAIL(final TreeNode parentNode) throws ParseException {
 }
 
 
-//PROF has some methods for these already Up a little bit - N
 //<ADD_OP> ::= + | -
 private void ADD_OP(final TreeNode parentNode) throws ParseException {
     final TreeNode thisNode = codeGenerator.addNonTerminalToTree(parentNode);

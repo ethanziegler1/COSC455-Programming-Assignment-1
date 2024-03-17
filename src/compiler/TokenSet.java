@@ -26,16 +26,7 @@ import java.util.List;
  * *** This is generally NOT the case in most programming languages!!! ***
  */
 public enum TokenSet {
-    ARTICLE("a", "the"),
-    CONJUNCTION("and", "or"),
-    NOUN("dog", "cat", "rat", "house", "tree"),
-    VERB("loves", "hates", "eats", "chases", "stalks"),
-    ADJECTIVE("fast", "slow", "furry", "sneaky", "lazy", "tall"),
     ADJ_SEP(","),
-    ADVERB("quickly", "secretly", "silently"),
-    PREPOSITION("of", "on", "around", "with", "up"),
-    PERIOD("."),
-
     READ("read"),
     LET("let"),
     WRITE("write"),
@@ -57,35 +48,11 @@ public enum TokenSet {
 
     OPEN_P("("),
     CLOSE_P(")"),
-/*added these from looking at sample valid input but ID may just need to be empty - N 
-
-Ideally ID takes in any arbitrarty string that Is not already defined in tokenset or Parser
-*/
     ID,
-
     SUBR_CALL("<-"),
     ASSIGN(":="),
-
-    // I Dont know if this works,😂 , check the parser to see if the method covers everythong from the grammar - N
-    STMT,
-    READ_STMT,
-    WRITE_STMT,
     VAR_DECL("var"),
-    ASSGN_STMT,
-
-    EXPR,
-    TERM,
-    TERM_TAIL,
-    FACTOR_TAIL,
-
-
-
-
-
     $$, // End of file
-
-    // THESE ARE NOT USED IN THE GRAMMAR, BUT MIGHT BE USEFUL...  :)
-    //NOT NECESARILY CORRECT --noah 
     UNIDENTIFIED_TOKEN, // Would probably be an "ID" in a "real programming language" (HINT!!!)
     // what about decimal values and floating point numbers?--n
     NUMBER; // A sequence of digits.
