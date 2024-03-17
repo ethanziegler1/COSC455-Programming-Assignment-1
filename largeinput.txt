@@ -18,8 +18,8 @@
 
 #    # An until...repeat block.
    until sum > 100
-#       let sum = sum * (1+n) - 100
-#   repeat
+       let sum = sum * (1+n) - 100
+   repeat
 #else
 #    if n > 0 then
 #     	# A subroutine call storing its return value.

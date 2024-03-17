@@ -275,6 +275,9 @@ private void STMT(final TreeNode parentNode) throws ParseException {
             MATCH(thisNode,TokenSet.UNTIL);
             EXPR(thisNode);
         }
+        case REPEAT:{
+            MATCH(thisNode, TokenSet.REPEAT);
+        }
         default: EMPTY(thisNode);
     }
 }
